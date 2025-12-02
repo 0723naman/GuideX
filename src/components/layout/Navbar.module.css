@@ -1,0 +1,283 @@
+/* ============================================
+   NAVBAR (Floating Pill Style)
+   ============================================ */
+
+.navbar {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
+    min-width: 1000px;
+    max-width: 95%;
+    /* Dynamic width */
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: var(--z-fixed);
+    background: var(--navbar-bg);
+    /* Light transparent background */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--navbar-border);
+    border-radius: 100px;
+    /* Pill shape */
+    padding: 0 3rem;
+    transition: all var(--transition-base);
+    animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar.scrolled {
+    background: var(--navbar-scrolled-bg);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    border-color: var(--navbar-scrolled-border);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   LOGO
+   ============================================ */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: #0f172a;
+    /* Hardcoded dark color */
+}
+
+.logoIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f172a;
+    /* Hardcoded dark color */
+}
+
+.logoText {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0f172a;
+    /* Hardcoded dark color */
+    letter-spacing: -0.02em;
+}
+
+/* ============================================
+   NAVIGATION LINKS
+   ============================================ */
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.navLink {
+    font-size: 0.9375rem;
+    /* ~15px */
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.6);
+    /* Muted text color */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.navLink:hover {
+    color: #0f172a;
+    /* Hardcoded dark color */
+}
+
+/* ============================================
+   RIGHT SECTION (Buttons)
+   ============================================ */
+
+.navButtons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Theme Toggle - Simple & Clean */
+.themeToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #0f172a;
+    /* Hardcoded dark color */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.themeToggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+/* Log in Button - Dark Blue/Black Pill */
+.loginBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    background: #0b1120;
+    /* Very dark blue/black */
+    color: white;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.loginBtn:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+}
+
+/* Get Started Button - White Pill */
+.cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.625rem 1.5rem;
+    background: white;
+    color: #0f172a;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.cta:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   MOBILE MENU
+   ============================================ */
+
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0f172a;
+    /* Hardcoded dark color */
+}
+
+.mobileMenu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform var(--transition-base);
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8) var(--space-6);
+}
+
+.mobileMenu.open {
+    transform: translateX(0);
+}
+
+.closeButton {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0f172a;
+    /* Hardcoded dark color */
+    margin-bottom: var(--space-6);
+}
+
+.mobileNav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mobileNavLink {
+    padding: 0.75rem 1rem;
+    color: #0f172a;
+    /* Hardcoded dark color */
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.mobileNavLink:hover {
+    background-color: var(--gray-100);
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: calc(var(--z-modal) - 1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+}
+
+.backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 900px) {
+    .nav {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        top: 16px;
+        height: 64px;
+        padding: 0 1rem;
+        min-width: auto;
+        width: 90%;
+    }
+
+    .navButtons {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+    }
+}
