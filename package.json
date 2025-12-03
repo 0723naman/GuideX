@@ -11,6 +11,7 @@
     "test": "node scripts/testApi.js"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "axios": "^1.6.8",
     "framer-motion": "^11.0.28",
     "lucide-react": "^0.344.0",

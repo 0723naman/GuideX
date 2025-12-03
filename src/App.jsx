@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { Analytics } from "@vercel/analytics/react"
 import LandingPage from '@pages/LandingPage'
 import UserSignup from '@pages/UserSignup'
 import CounselorSignup from '@pages/CounselorSignup'
@@ -33,6 +34,7 @@ function App() {
         {/* Protected Admin Routes */}
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
       </Routes>
+      <Analytics />
     </div>
   )
 }
