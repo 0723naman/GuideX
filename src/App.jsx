@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import LandingPage from '@pages/LandingPage'
 import UserSignup from '@pages/UserSignup'
 import CounselorSignup from '@pages/CounselorSignup'
@@ -35,6 +36,7 @@ function App() {
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
       </Routes>
       <Analytics />
+      <SpeedInsights />
     </div>
   )
 }
