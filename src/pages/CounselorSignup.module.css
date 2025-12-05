@@ -1,0 +1,242 @@
+.pageContainer {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.contentWrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 150px 2rem 2rem;
+    /* Reduced top/bottom padding */
+    max-width: 1200px;
+    /* Slightly reduced max-width for tighter focus */
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    /* Ensure padding doesn't add to width */
+}
+
+.splitLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    /* Reduced gap */
+    align-items: center;
+    width: 100%;
+}
+
+/* Left Side - Hero Content */
+.heroSection {
+    padding-right: 1rem;
+}
+
+.heroTitle {
+    font-size: 3rem;
+    /* Slightly smaller title */
+    font-weight: 800;
+    line-height: 1.1;
+    color: #0f172a;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+.highlight {
+    background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.heroSubtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    max-width: 480px;
+}
+
+.benefitsGrid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.benefitItem {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.iconBox {
+    width: 42px;
+    /* Smaller icons */
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.benefitContent h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.2rem;
+}
+
+.benefitContent p {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Right Side - Form Card */
+.formSection {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    /* Limit form width */
+    margin: 0 auto;
+}
+
+.formCard {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+}
+
+.formHeader {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.formTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+}
+
+.formSubtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.formGrid {
+    display: grid;
+    gap: 1rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #334155;
+    margin-left: 0.2rem;
+}
+
+.select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    font-size: 0.95rem;
+    color: #0f172a;
+    transition: all 0.2s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submitBtn {
+    margin-top: 0.5rem;
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.submitBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 12px -3px rgba(59, 130, 246, 0.3);
+}
+
+.submitBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .splitLayout {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .heroSection {
+        padding-right: 0;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .heroSubtitle {
+        margin: 0 auto 2rem;
+    }
+
+    .benefitsGrid {
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: left;
+        grid-template-columns: 1fr 1fr;
+        /* 2 columns for benefits on tablet */
+    }
+}
+
+@media (max-width: 768px) {
+    .benefitsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .contentWrapper {
+        padding: 90px 1rem 2rem;
+    }
+
+    .heroTitle {
+        font-size: 2.25rem;
+    }
+
+    .formCard {
+        padding: 1.5rem;
+    }
+}

@@ -1,27 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Shield, Menu, X, ArrowRight, Sun, Moon, MessageCircle, LayoutDashboard } from 'lucide-react';
 import Logo from '../ui/Logo';
 import styles from './Navbar.module.css';
 import { useTheme } from '../../context/ThemeContext';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
+    const lastScrollY = useRef(0);
+
+    const isDashboard = false; // location.pathname.includes('/dashboard');
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 20 || location.pathname.includes('/dashboard')) {
+            const currentScrollY = window.scrollY;
+
+            // Determine visibility
+            if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+
+            // Determine background style
+            if (currentScrollY > 20) {
                 setIsScrolled(true);
             } else {
                 setIsScrolled(false);
             }
+
+            lastScrollY.current = currentScrollY;
         };
 
         // Initial check
-        if (location.pathname.includes('/dashboard')) {
+        if (window.scrollY > 20) {
             setIsScrolled(true);
         }
 
@@ -43,7 +59,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
+            <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''} ${!isVisible ? styles.hidden : ''}`}>
                 {/* Logo Section */}
                 <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
                     <Logo />
@@ -51,23 +67,58 @@ const Navbar = () => {
 
                 {/* Desktop Navigation */}
                 <div className={styles.nav}>
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            to={link.path}
-                            className={styles.navLink}
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                    {!isDashboard ? (
+                        navLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                to={link.path}
+                                className={styles.cta}
+                            >
+                                {link.name}
+                            </Link>
+                        ))
+                    ) : (
+                        // Authenticated Links
+                        <div style={{ display: 'flex', gap: '2rem' }}>
+                            <Link to="/chats" className={styles.navIconLink}>
+                                <MessageCircle size={20} />
+                                <span>Chats</span>
+                            </Link>
+                            <Link to="/dashboard/user" className={`${styles.navIconLink} ${styles.active}`}>
+                                <LayoutDashboard size={20} />
+                                <span>Dashboard</span>
+                            </Link>
+                        </div>
+                    )}
                 </div>
 
-                {/* Desktop Buttons */}
+                {/* Right Section */}
                 <div className={styles.navButtons}>
-                    <Link to="/dashboard/admin" className={styles.cta}>
-                        Admin
-                    </Link>
+                    {!isDashboard ? (
+                        location.pathname === '/' && (
+                            <>
+                                <Link to="/signup/counselor" className={styles.cta}>
+                                    Join As Counselor
+                                </Link>
+                                <Link to="/dashboard/admin" className={styles.cta}>
+                                    Admin
+                                </Link>
+                            </>
+                        )
+                    ) : (
+                        // Authenticated Right Section
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                            <button className={styles.themeToggle} onClick={toggleTheme}>
+                                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                            </button>
+                            <div className={styles.profileSection}>
+                                <div className={styles.profileAvatar}>R</div>
+                                <span className={styles.profileName}>Raghav Sharma</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
+
                 {/* Mobile Menu Toggle */}
                 <button className={styles.hamburger} onClick={toggleMobileMenu}>
                     <Menu size={24} />
@@ -87,26 +138,55 @@ const Navbar = () => {
                 </button>
 
                 <div className={styles.mobileNav}>
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            to={link.path}
-                            className={styles.mobileNavLink}
-                            onClick={closeMobileMenu}
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
-
-                    <div style={{ borderTop: '1px solid var(--gray-200)', margin: '0.5rem 0' }}></div>
-                    <Link
-                        to="/dashboard/admin"
-                        className={styles.mobileNavLink}
-                        style={{ background: '#0b1120', color: 'white', textAlign: 'center' }}
-                        onClick={closeMobileMenu}
-                    >
-                        Admin
-                    </Link>
+                    {!isDashboard ? (
+                        <>
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.name}
+                                    to={link.path}
+                                    className={styles.mobileNavLink}
+                                    onClick={closeMobileMenu}
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+                            {location.pathname === '/' && (
+                                <>
+                                    <Link
+                                        to="/signup/counselor"
+                                        className={styles.mobileNavLink}
+                                        style={{ color: '#0ea5e9', fontWeight: 600 }}
+                                        onClick={closeMobileMenu}
+                                    >
+                                        Join As Counselor
+                                    </Link>
+                                    <div style={{ borderTop: '1px solid var(--gray-200)', margin: '0.5rem 0' }}></div>
+                                    <Link
+                                        to="/dashboard/admin"
+                                        className={styles.mobileNavLink}
+                                        style={{ background: '#0b1120', color: 'white', textAlign: 'center' }}
+                                        onClick={closeMobileMenu}
+                                    >
+                                        Admin
+                                    </Link>
+                                </>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/chats" className={styles.mobileNavLink} onClick={closeMobileMenu}>
+                                Chats
+                            </Link>
+                            <Link to="/dashboard/user" className={styles.mobileNavLink} onClick={closeMobileMenu}>
+                                Dashboard
+                            </Link>
+                            <div style={{ borderTop: '1px solid var(--gray-200)', margin: '0.5rem 0' }}></div>
+                            <div style={{ padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <div className={styles.profileAvatar}>R</div>
+                                <span className={styles.profileName}>Raghav Sharma</span>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </>

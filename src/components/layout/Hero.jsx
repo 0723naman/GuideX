@@ -58,12 +58,9 @@ const Hero = () => {
                         className={styles.ctaButtons}
                         variants={fadeInUp}
                     >
-                        <button
-                            className={`${styles.button} ${styles.buttonPrimary}`}
-                            onClick={() => setIsAuthModalOpen(true)}
-                        >
+                        <Link to="/dashboard/user" className={`${styles.button} ${styles.buttonPrimary}`}>
                             Enter as User
-                        </button>
+                        </Link>
 
                         <Link to="/dashboard/counselor" className={`${styles.button} ${styles.buttonSecondary}`}>
                             Enter as Counselor

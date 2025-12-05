@@ -90,6 +90,24 @@ const AuthModal = ({ isOpen, onClose }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
+
+        if (isSignUp) {
+            // Save user to localStorage for demo purposes
+            const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            const newUser = {
+                id: Date.now().toString(),
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+                joinedAt: new Date().toISOString(),
+                status: 'Active'
+            };
+            localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
+
+            // Trigger storage event for realtime updates
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        onClose();
     };
 
     const handleChange = (e) => {

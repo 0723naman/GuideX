@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './Modal.module.css';
 
-const Modal = ({ isOpen, onClose, title, children, className, hideHeader }) => {
+const Modal = ({ isOpen, onClose, title, children, className, hideHeader, hideCloseButton }) => {
     useEffect(() => {
         if (isOpen) {
             // Prevent scrolling on the body when modal is open
@@ -31,9 +31,11 @@ const Modal = ({ isOpen, onClose, title, children, className, hideHeader }) => {
                     {!hideHeader && (
                         <div className={styles.header}>
                             <h2 className={styles.title}>{title}</h2>
-                            <button className={styles.closeButton} onClick={onClose}>
-                                &times;
-                            </button>
+                            {!hideCloseButton && (
+                                <button className={styles.closeButton} onClick={onClose}>
+                                    &times;
+                                </button>
+                            )}
                         </div>
                     )}
                     <div className={styles.content}>{children}</div>

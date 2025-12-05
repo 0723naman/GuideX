@@ -40,7 +40,7 @@
   --black: #000000;
 
   /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  --gradient-hero: linear-gradient(180deg, #4b7bd8 0%, #89b0f3 60%, #ffffff 100%);
   --gradient-primary: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
 
   /* Shadows */

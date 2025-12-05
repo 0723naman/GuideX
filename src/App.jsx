@@ -8,6 +8,9 @@ import Login from '@pages/Login'
 import UserDashboard from '@pages/UserDashboard'
 import CounselorDashboard from '@pages/CounselorDashboard'
 import AdminDashboard from '@pages/AdminDashboard'
+import AdminApplications from '@pages/AdminApplications'
+import AdminCounsellors from '@pages/AdminCounsellors'
+import AdminUsers from '@pages/AdminUsers'
 import FindCounselor from '@pages/FindCounselor'
 import AboutUs from '@pages/AboutUs'
 
@@ -34,6 +37,9 @@ function App() {
 
         {/* Protected Admin Routes */}
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
+        <Route path="/dashboard/admin/applications" element={<AdminApplications />} />
+        <Route path="/dashboard/admin/counsellors" element={<AdminCounsellors />} />
+        <Route path="/dashboard/admin/users" element={<AdminUsers />} />
       </Routes>
       <Analytics />
       <SpeedInsights />
