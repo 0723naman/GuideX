@@ -15,6 +15,7 @@ const CounselorSignup = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        password: '',
         specialization: '',
         experience: '',
         hourlyRate: '',
@@ -127,6 +128,15 @@ const CounselorSignup = () => {
                                     type="email"
                                     placeholder="john@example.com"
                                     value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Input
+                                    label="Password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Create a password"
+                                    value={formData.password}
                                     onChange={handleChange}
                                     required
                                 />
