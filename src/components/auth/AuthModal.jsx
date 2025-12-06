@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User, Stethoscope } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../ui/Modal';
 import TermsModal from './TermsModal';
 import styles from './AuthModal.module.css';
@@ -8,6 +9,8 @@ import styles from './AuthModal.module.css';
 const SIDE_IMAGE = "/auth-image-2.jpg";
 
 const AuthModal = ({ isOpen, onClose }) => {
+    const navigate = useNavigate();
+    const [view, setView] = useState('selection'); // 'selection' or 'auth'
     const [isSignUp, setIsSignUp] = useState(true);
     const [isTermsOpen, setIsTermsOpen] = useState(false);
 
@@ -29,6 +32,21 @@ const AuthModal = ({ isOpen, onClose }) => {
         // password field in formData will be synced with realPassword
         termsAccepted: false
     });
+
+    // Reset state when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setView('selection');
+            setIsSignUp(true);
+            setRealPassword('');
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                termsAccepted: false
+            });
+        }
+    }, [isOpen]);
 
     // Cleanup timeout
     useEffect(() => {
@@ -52,7 +70,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
             return () => observer.disconnect();
         }
-    }, [isOpen, isSignUp]); // Re-measure when modal opens or mode changes
+    }, [isOpen, isSignUp, view]); // Re-measure when modal opens or mode changes
 
     // Sync realPassword to formData and calculate strength/progress
     useEffect(() => {
@@ -79,25 +97,39 @@ const AuthModal = ({ isOpen, onClose }) => {
             newStrength = 'weak';
         } else if (score < 5) {
             newStrength = 'medium';
-        } else {
-            newStrength = 'strong';
         }
 
         setStrength(newStrength);
         setProgress(newProgress);
     }, [realPassword]);
 
+    const handleChange = (e) => {
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setFormData({ ...formData, [e.target.name]: value });
+    };
+
+    const [error, setError] = useState('');
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        setError('');
         console.log('Form submitted:', formData);
 
+        const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+
         if (isSignUp) {
-            // Save user to localStorage for demo purposes
-            const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            // Check if user already exists
+            if (existingUsers.some(u => u.email === formData.email)) {
+                setError('Account already exists. Please log in.');
+                return;
+            }
+
+            // Save user to localStorage
             const newUser = {
                 id: Date.now().toString(),
                 name: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email,
+                password: realPassword, // In a real app, never store plain text passwords!
                 joinedAt: new Date().toISOString(),
                 status: 'Active'
             };
@@ -105,14 +137,27 @@ const AuthModal = ({ isOpen, onClose }) => {
 
             // Trigger storage event for realtime updates
             window.dispatchEvent(new Event('storage'));
+
+            navigate('/dashboard/user');
+            onClose();
+        } else {
+            // Login Logic
+            const user = existingUsers.find(u => u.email === formData.email && u.password === realPassword);
+
+            if (user) {
+                console.log('Login successful:', user);
+                navigate('/dashboard/user');
+                onClose();
+            } else {
+                // Check if email exists to give specific error
+                const emailExists = existingUsers.some(u => u.email === formData.email);
+                if (emailExists) {
+                    setError('Wrong credentials. Please try again.');
+                } else {
+                    setError("Account doesn't exist. Please sign up.");
+                }
+            }
         }
-
-        onClose();
-    };
-
-    const handleChange = (e) => {
-        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-        setFormData({ ...formData, [e.target.name]: value });
     };
 
     const handlePasswordChange = (e) => {
@@ -218,6 +263,11 @@ const AuthModal = ({ isOpen, onClose }) => {
         </svg>
     );
 
+    const handleCounselorEntry = () => {
+        onClose();
+        navigate('/signup/counselor');
+    };
+
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose} className={styles.modalWide} hideHeader={true}>
@@ -236,126 +286,169 @@ const AuthModal = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Right Side - Form */}
+                    {/* Right Side - Dynamic Content */}
                     <div className={styles.rightSide}>
-                        {!isSignUp && (
-                            <button className={styles.backButton} onClick={toggleMode}>
-                                <ArrowLeft size={20} />
-                            </button>
+                        {view === 'selection' ? (
+                            <div className={styles.selectionContainer}>
+                                <div className={styles.header}>
+                                    <h2 className={styles.title}>Welcome to GuideX</h2>
+                                    <p className={styles.subtitle}>Choose how you want to continue</p>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '30px' }}>
+                                    <button
+                                        className={styles.submitBtn}
+                                        onClick={() => setView('auth')}
+                                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                                    >
+                                        <User size={20} />
+                                        Enter as User
+                                    </button>
+
+                                    <button
+                                        className={styles.socialBtn} // Reusing socialBtn style for secondary look but matching width
+                                        onClick={handleCounselorEntry}
+                                        style={{ width: '100%', padding: '12px', fontSize: '14px', fontWeight: '500', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                                    >
+                                        <Stethoscope size={20} />
+                                        Enter as Counselor
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            // Auth View (Login/Signup Form)
+                            <>
+                                <button className={styles.backButton} onClick={() => setView('selection')}>
+                                    <ArrowLeft size={20} />
+                                </button>
+
+                                <div className={styles.header}>
+                                    <h2 className={styles.title}>
+                                        {isSignUp ? 'Create an Account' : 'Welcome Back'}
+                                    </h2>
+                                    <p className={styles.subtitle}>
+                                        {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+                                        <a onClick={toggleMode}>
+                                            {isSignUp ? 'Log in' : 'Sign up'}
+                                        </a>
+                                    </p>
+                                </div>
+
+                                <form className={styles.form} onSubmit={handleSubmit}>
+                                    {error && (
+                                        <div style={{
+                                            backgroundColor: '#fee2e2',
+                                            color: '#b91c1c',
+                                            padding: '10px',
+                                            borderRadius: '8px',
+                                            fontSize: '14px',
+                                            marginBottom: '16px',
+                                            textAlign: 'center'
+                                        }}>
+                                            {error}
+                                        </div>
+                                    )}
+                                    {isSignUp && (
+                                        <div className={styles.row}>
+                                            <div className={styles.inputGroup}>
+                                                <label className={styles.label}>First Name</label>
+                                                <input
+                                                    className={styles.input}
+                                                    placeholder="John"
+                                                    name="firstName"
+                                                    value={formData.firstName}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                            <div className={styles.inputGroup}>
+                                                <label className={styles.label}>Last Name</label>
+                                                <input
+                                                    className={styles.input}
+                                                    placeholder="Doe"
+                                                    name="lastName"
+                                                    value={formData.lastName}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className={styles.inputGroup}>
+                                        <label className={styles.label}>Email Address</label>
+                                        <input
+                                            className={styles.input}
+                                            type="email"
+                                            placeholder="Email Address"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+
+                                    <div className={styles.inputGroup}>
+                                        <label className={styles.label}>Password</label>
+                                        <div className={styles.inputWrapper} ref={containerRef}>
+                                            <input
+                                                ref={inputRef}
+                                                className={`${styles.input} ${styles.passwordInput}`}
+                                                type="text"
+                                                placeholder="Password"
+                                                name="password"
+                                                value={getDisplayPassword()}
+                                                onChange={handlePasswordChange}
+                                                autoComplete="off"
+                                            />
+                                            {/* Animated SVG Border */}
+                                            <svg className={styles.progressRing} width="100%" height="100%">
+                                                {/* Animated Progress */}
+                                                <path
+                                                    d={getPathD()}
+                                                    fill="none"
+                                                    stroke={getStrengthColor()}
+                                                    strokeWidth="3"
+                                                    pathLength="100"
+                                                    strokeDasharray="100"
+                                                    strokeDashoffset={100 - progress}
+                                                    strokeLinecap="round"
+                                                    style={{ transition: 'stroke-dashoffset 0.3s ease, stroke 0.3s ease' }}
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" className={styles.submitBtn}>
+                                        {isSignUp ? 'Create Account' : 'Log In'}
+                                    </button>
+
+                                    {isSignUp && (
+                                        <div className={styles.terms}>
+                                            <input
+                                                type="checkbox"
+                                                name="termsAccepted"
+                                                checked={formData.termsAccepted}
+                                                onChange={handleChange}
+                                            />
+                                            <span>
+                                                I agree to the <span className={styles.termsLink} onClick={() => setIsTermsOpen(true)}>Terms & Condition</span>
+                                            </span>
+                                        </div>
+                                    )}
+                                </form>
+
+                                <div className={styles.divider}>or</div>
+
+                                <div className={styles.socialButtons}>
+                                    <button className={styles.socialBtn}>
+                                        <GoogleIcon />
+                                        Continue with Google
+                                    </button>
+                                    <button className={styles.socialBtn}>
+                                        <FacebookIcon />
+                                        Continue with Facebook
+                                    </button>
+                                </div>
+                            </>
                         )}
-
-                        <div className={styles.header}>
-                            <h2 className={styles.title}>
-                                {isSignUp ? 'Create an Account' : 'Welcome Back'}
-                            </h2>
-                            <p className={styles.subtitle}>
-                                {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-                                <a onClick={toggleMode}>
-                                    {isSignUp ? 'Log in' : 'Sign up'}
-                                </a>
-                            </p>
-                        </div>
-
-                        <form className={styles.form} onSubmit={handleSubmit}>
-                            {isSignUp && (
-                                <div className={styles.row}>
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>First Name</label>
-                                        <input
-                                            className={styles.input}
-                                            placeholder="John"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>Last Name</label>
-                                        <input
-                                            className={styles.input}
-                                            placeholder="Doe"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className={styles.inputGroup}>
-                                <label className={styles.label}>Email Address</label>
-                                <input
-                                    className={styles.input}
-                                    type="email"
-                                    placeholder="Email Address"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className={styles.inputGroup}>
-                                <label className={styles.label}>Password</label>
-                                <div className={styles.inputWrapper} ref={containerRef}>
-                                    <input
-                                        ref={inputRef}
-                                        className={`${styles.input} ${styles.passwordInput}`}
-                                        type="text"
-                                        placeholder="Password"
-                                        name="password"
-                                        value={getDisplayPassword()}
-                                        onChange={handlePasswordChange}
-                                        autoComplete="off"
-                                    />
-                                    {/* Animated SVG Border */}
-                                    <svg className={styles.progressRing} width="100%" height="100%">
-                                        {/* Animated Progress */}
-                                        <path
-                                            d={getPathD()}
-                                            fill="none"
-                                            stroke={getStrengthColor()}
-                                            strokeWidth="3"
-                                            pathLength="100"
-                                            strokeDasharray="100"
-                                            strokeDashoffset={100 - progress}
-                                            strokeLinecap="round"
-                                            style={{ transition: 'stroke-dashoffset 0.3s ease, stroke 0.3s ease' }}
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <button type="submit" className={styles.submitBtn}>
-                                {isSignUp ? 'Create Account' : 'Log In'}
-                            </button>
-
-                            {isSignUp && (
-                                <div className={styles.terms}>
-                                    <input
-                                        type="checkbox"
-                                        name="termsAccepted"
-                                        checked={formData.termsAccepted}
-                                        onChange={handleChange}
-                                    />
-                                    <span>
-                                        I agree to the <span className={styles.termsLink} onClick={() => setIsTermsOpen(true)}>Terms & Condition</span>
-                                    </span>
-                                </div>
-                            )}
-                        </form>
-
-                        <div className={styles.divider}>or</div>
-
-                        <div className={styles.socialButtons}>
-                            <button className={styles.socialBtn}>
-                                <GoogleIcon />
-                                Continue with Google
-                            </button>
-                            <button className={styles.socialBtn}>
-                                <FacebookIcon />
-                                Continue with Facebook
-                            </button>
-                        </div>
                     </div>
                 </div>
             </Modal>

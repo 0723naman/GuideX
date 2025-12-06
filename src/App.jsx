@@ -13,6 +13,7 @@ import AdminCounsellors from '@pages/AdminCounsellors'
 import AdminUsers from '@pages/AdminUsers'
 import FindCounselor from '@pages/FindCounselor'
 import AboutUs from '@pages/AboutUs'
+import ContactUs from '@pages/ContactUs'
 
 import ScrollToTop from './components/utils/ScrollToTop'
 
@@ -24,6 +25,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/signup/user" element={<UserSignup />} />
         <Route path="/signup/counselor" element={<CounselorSignup />} />
         <Route path="/login" element={<Login />} />

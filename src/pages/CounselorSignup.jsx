@@ -17,6 +17,7 @@ const CounselorSignup = () => {
         email: '',
         specialization: '',
         experience: '',
+        hourlyRate: '',
     });
     const [loading, setLoading] = useState(false);
 
@@ -147,6 +148,16 @@ const CounselorSignup = () => {
                                         ))}
                                     </select>
                                 </div>
+
+                                <Input
+                                    label="Hourly Rate (₹/hr)"
+                                    name="hourlyRate"
+                                    type="number"
+                                    placeholder="e.g. 500"
+                                    value={formData.hourlyRate}
+                                    onChange={handleChange}
+                                    required
+                                />
 
                                 <Input
                                     label="Years of Experience"

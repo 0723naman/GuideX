@@ -7,7 +7,7 @@ import { applicationService } from '../../services/application.service';
 const FindCounselorModal = ({ isOpen, onClose }) => {
     const [counsellors, setCounsellors] = useState([]);
     const [selectedCounselor, setSelectedCounselor] = useState(null);
-    const [bookingData, setBookingData] = useState({ date: '', time: '', reason: '' });
+    const [bookingData, setBookingData] = useState({ date: '', time: '', reason: '', duration: 1 });
     const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
@@ -15,7 +15,7 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
             loadCounsellors();
             setSelectedCounselor(null);
             setShowSuccess(false);
-            setBookingData({ date: '', time: '', reason: '' });
+            setBookingData({ date: '', time: '', reason: '', duration: 1 });
         }
 
         const handleStorageChange = (e) => {
@@ -37,8 +37,16 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
         setSelectedCounselor(counselor);
     };
 
+    const getHourlyRate = (counselor) => {
+        // Fallback if no rate is set (legacy data)
+        return parseInt(counselor.hourlyRate) || 500;
+    };
+
     const handleBookingSubmit = (e) => {
         e.preventDefault();
+
+        const rate = getHourlyRate(selectedCounselor);
+        const totalCost = rate * bookingData.duration;
 
         // Create booking object
         const newBooking = {
@@ -46,11 +54,13 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
             counselorId: selectedCounselor.id,
             counselorName: selectedCounselor.name,
             counselorSpecialization: selectedCounselor.specialization,
-            counselorImage: selectedCounselor.image || null, // Assuming image might be available or null
-            userId: 'current-user-id', // In a real app, get from auth context
-            userName: 'Current User', // In a real app, get from auth context
+            counselorImage: selectedCounselor.image || null,
+            userId: 'current-user-id',
+            userName: 'Current User',
             date: bookingData.date,
             time: bookingData.time,
+            duration: bookingData.duration,
+            totalCost: totalCost,
             reason: bookingData.reason,
             status: 'pending',
             createdAt: new Date().toISOString()
@@ -82,6 +92,7 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
             <div style={{ padding: '1rem' }}>
                 {!selectedCounselor ? (
                     <>
+                        {/* Header Section */}
                         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                             <div style={{
                                 width: '80px',
@@ -102,6 +113,7 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
                             </p>
                         </div>
 
+                        {/* Counselor List */}
                         {counsellors.length === 0 ? (
                             <div style={{ padding: '2rem', background: '#f8fafc', borderRadius: '0.5rem', border: '1px dashed #cbd5e1', textAlign: 'center', color: '#64748b' }}>
                                 No counselors available at the moment.
@@ -118,9 +130,14 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
                                             <p style={{ color: '#64748b', marginBottom: '0.25rem' }}>
                                                 <span style={{ fontWeight: 500 }}>Specialization:</span> {counsellor.specialization}
                                             </p>
-                                            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-                                                <span style={{ fontWeight: 500 }}>Experience:</span> {counsellor.experience} years
-                                            </p>
+                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
+                                                    <span style={{ fontWeight: 500 }}>Exp:</span> {counsellor.experience}y
+                                                </p>
+                                                <p style={{ color: '#0ea5e9', fontSize: '0.9rem', fontWeight: 600 }}>
+                                                    ₹{getHourlyRate(counsellor)}/hr
+                                                </p>
+                                            </div>
                                         </div>
                                         <button
                                             onClick={() => handleBookClick(counsellor)}
@@ -138,7 +155,7 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
                                             }}
                                         >
                                             <Calendar size={18} />
-                                            Book Session
+                                            Book
                                         </button>
                                     </div>
                                 ))}
@@ -155,30 +172,97 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
                     </div>
                 ) : (
                     <form onSubmit={handleBookingSubmit} style={{ maxWidth: '500px', margin: '0 auto' }}>
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#1e293b' }}>Select Date</label>
-                            <input
-                                type="date"
-                                required
-                                value={bookingData.date}
-                                onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: 'white', color: '#334155', colorScheme: 'light' }}
-                            />
+                        {/* Selected Counselor Info Summary */}
+                        <div style={{
+                            background: '#f8fafc',
+                            padding: '1rem',
+                            borderRadius: '0.5rem',
+                            marginBottom: '1.5rem',
+                            border: '1px solid #e2e8f0',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <div>
+                                <h4 style={{ fontWeight: 600, color: '#334155' }}>Counselor Rate</h4>
+                                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Base price per hour</p>
+                            </div>
+                            <div style={{ fontWeight: 700, color: '#0ea5e9', fontSize: '1.1rem' }}>
+                                ₹{getHourlyRate(selectedCounselor)}/hr
+                            </div>
                         </div>
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#1e293b' }}>Select Time</label>
-                            <input
-                                type="time"
-                                required
-                                value={bookingData.time}
-                                onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: 'white', color: '#334155', colorScheme: 'light' }}
-                            />
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#1e293b' }}>Select Date</label>
+                                <input
+                                    type="date"
+                                    required
+                                    value={bookingData.date}
+                                    onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: 'white', color: '#334155', colorScheme: 'light' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#1e293b' }}>Select Time</label>
+                                <input
+                                    type="time"
+                                    required
+                                    value={bookingData.time}
+                                    onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', background: 'white', color: '#334155', colorScheme: 'light' }}
+                                />
+                            </div>
                         </div>
+
+                        {/* Duration Selection */}
+                        <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '0.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                <label style={{ fontWeight: 500, color: '#1e293b' }}>Session Duration</label>
+                                <span style={{ fontWeight: 600, color: '#0f172a' }}>{bookingData.duration} Hour(s)</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="1"
+                                max="5"
+                                step="0.5"
+                                value={bookingData.duration}
+                                onChange={(e) => setBookingData({ ...bookingData, duration: parseFloat(e.target.value) })}
+                                style={{ width: '100%', accentColor: '#0f172a', cursor: 'pointer' }}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem', fontSize: '0.8rem', color: '#94a3b8' }}>
+                                <span>1 Hr</span>
+                                <span>3 Hrs</span>
+                                <span>5 Hrs</span>
+                            </div>
+                        </div>
+
+                        {/* Total Cost Calculation */}
+                        <div style={{
+                            marginBottom: '2rem',
+                            padding: '1.25rem',
+                            background: '#eff6ff',
+                            borderRadius: '0.75rem',
+                            border: '1px solid #bfdbfe',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ color: '#1e3a8a', fontWeight: 600 }}>Total Estimated Cost</span>
+                                <span style={{ color: '#60a5fa', fontSize: '0.85rem' }}>
+                                    {bookingData.duration} hrs × ₹{getHourlyRate(selectedCounselor)}
+                                </span>
+                            </div>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#172554' }}>
+                                ₹{(getHourlyRate(selectedCounselor) * bookingData.duration).toFixed(2)}
+                            </div>
+                        </div>
+
                         <div style={{ marginBottom: '2rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#1e293b' }}>Reason for Session</label>
                             <textarea
-                                rows="4"
+                                rows="3"
                                 required
                                 value={bookingData.reason}
                                 onChange={(e) => setBookingData({ ...bookingData, reason: e.target.value })}
@@ -186,6 +270,7 @@ const FindCounselorModal = ({ isOpen, onClose }) => {
                                 style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', resize: 'vertical', background: 'white', color: '#334155' }}
                             />
                         </div>
+
                         <div style={{ display: 'flex', gap: '1rem' }}>
                             <button
                                 type="button"

@@ -65,46 +65,26 @@ const Navbar = () => {
                     <Logo />
                 </Link>
 
-                {/* Desktop Navigation */}
-                <div className={styles.nav}>
-                    {!isDashboard ? (
-                        navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                className={styles.cta}
-                            >
-                                {link.name}
-                            </Link>
-                        ))
-                    ) : (
-                        // Authenticated Links
-                        <div style={{ display: 'flex', gap: '2rem' }}>
-                            <Link to="/chats" className={styles.navIconLink}>
-                                <MessageCircle size={20} />
-                                <span>Chats</span>
-                            </Link>
-                            <Link to="/dashboard/user" className={`${styles.navIconLink} ${styles.active}`}>
-                                <LayoutDashboard size={20} />
-                                <span>Dashboard</span>
-                            </Link>
-                        </div>
-                    )}
-                </div>
-
                 {/* Right Section */}
                 <div className={styles.navButtons}>
                     {!isDashboard ? (
-                        location.pathname === '/' && (
-                            <>
-                                <Link to="/signup/counselor" className={styles.cta}>
-                                    Join As Counselor
+                        <>
+                            {location.pathname !== '/about-us' && (
+                                <Link to="/about-us" className={styles.cta}>
+                                    About Us
                                 </Link>
+                            )}
+                            {location.pathname !== '/contact-us' && (
+                                <Link to="/contact-us" className={styles.cta}>
+                                    Contact Us
+                                </Link>
+                            )}
+                            {location.pathname !== '/dashboard/admin' && (
                                 <Link to="/dashboard/admin" className={styles.cta}>
                                     Admin
                                 </Link>
-                            </>
-                        )
+                            )}
+                        </>
                     ) : (
                         // Authenticated Right Section
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -141,25 +121,31 @@ const Navbar = () => {
                     {!isDashboard ? (
                         <>
                             {navLinks.map((link) => (
-                                <Link
-                                    key={link.name}
-                                    to={link.path}
-                                    className={styles.mobileNavLink}
-                                    onClick={closeMobileMenu}
-                                >
-                                    {link.name}
-                                </Link>
-                            ))}
-                            {location.pathname === '/' && (
-                                <>
+                                link.path !== location.pathname && (
                                     <Link
-                                        to="/signup/counselor"
+                                        key={link.name}
+                                        to={link.path}
                                         className={styles.mobileNavLink}
-                                        style={{ color: '#0ea5e9', fontWeight: 600 }}
                                         onClick={closeMobileMenu}
                                     >
-                                        Join As Counselor
+                                        {link.name}
                                     </Link>
+                                )
+                            ))}
+
+                            {location.pathname !== '/contact-us' && (
+                                <Link
+                                    to="/contact-us"
+                                    className={styles.mobileNavLink}
+                                    style={{ color: '#0ea5e9', fontWeight: 600 }}
+                                    onClick={closeMobileMenu}
+                                >
+                                    Contact Us
+                                </Link>
+                            )}
+
+                            {location.pathname !== '/dashboard/admin' && (
+                                <>
                                     <div style={{ borderTop: '1px solid var(--gray-200)', margin: '0.5rem 0' }}></div>
                                     <Link
                                         to="/dashboard/admin"
